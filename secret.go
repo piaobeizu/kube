@@ -10,6 +10,7 @@ package kube
 
 import (
 	"context"
+	"reflect"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -139,4 +140,26 @@ func (s *Secret) CreateOrUpdate() error {
 func (s *Secret) Empty() bool {
 	_, err := s.client.CoreV1().Secrets(s.Namespace).Get(s.ctx, s.Name, metav1.GetOptions{})
 	return errors.IsNotFound(err)
+}
+
+func (s *Secret) StringDataEqual() bool {
+	secret, err := s.Get()
+	if errors.IsNotFound(err) {
+		return false
+	}
+	if secret == nil {
+		return false
+	}
+	return reflect.DeepEqual(secret.StringData, s.Secret.StringData)
+}
+
+func (s *Secret) DataEqual() bool {
+	secret, err := s.Get()
+	if errors.IsNotFound(err) {
+		return false
+	}
+	if secret == nil {
+		return false
+	}
+	return reflect.DeepEqual(secret.Data, s.Secret.Data)
 }

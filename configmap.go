@@ -10,6 +10,7 @@ package kube
 
 import (
 	"context"
+	"reflect"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -120,4 +121,15 @@ func (c *ConfigMap) CreateOrUpdate() error {
 func (c *ConfigMap) Empty() bool {
 	_, err := c.Get()
 	return errors.IsNotFound(err)
+}
+
+func (c *ConfigMap) DataEqual() bool {
+	cm, err := c.Get()
+	if errors.IsNotFound(err) {
+		return false
+	}
+	if cm == nil {
+		return false
+	}
+	return reflect.DeepEqual(cm.Data, c.ConfigMap.Data)
 }
