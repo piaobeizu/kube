@@ -147,10 +147,11 @@ func (s *Secret) StringDataEqual() bool {
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(secret.StringData) == 0 && len(s.Secret.StringData) == 0 {
-		return true
+	datas := map[string]string{}
+	for k, v := range secret.Data {
+		datas[k] = string(v)
 	}
-	return reflect.DeepEqual(secret.StringData, s.Secret.StringData)
+	return reflect.DeepEqual(datas, s.Secret.StringData)
 }
 
 func (s *Secret) DataEqual() bool {
