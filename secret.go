@@ -143,23 +143,21 @@ func (s *Secret) Empty() bool {
 }
 
 func (s *Secret) StringDataEqual() bool {
-	secret, err := s.Get()
-	if errors.IsNotFound(err) {
-		return false
+	secret, _ := s.Get()
+	if secret != nil {
+		return reflect.DeepEqual(secret.StringData, s.Secret.StringData)
+	} else if s.Secret.StringData == nil {
+		return true
 	}
-	if secret == nil {
-		return false
-	}
-	return reflect.DeepEqual(secret.StringData, s.Secret.StringData)
+	return false
 }
 
 func (s *Secret) DataEqual() bool {
-	secret, err := s.Get()
-	if errors.IsNotFound(err) {
-		return false
+	secret, _ := s.Get()
+	if secret != nil {
+		return reflect.DeepEqual(secret.Data, s.Secret.Data)
+	} else if s.Secret.Data == nil {
+		return true
 	}
-	if secret == nil {
-		return false
-	}
-	return reflect.DeepEqual(secret.Data, s.Secret.Data)
+	return false
 }
