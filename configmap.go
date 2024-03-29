@@ -127,7 +127,7 @@ func (c *ConfigMap) DataEqual() bool {
 	cm, _ := c.Get()
 	if cm != nil {
 		return reflect.DeepEqual(cm.Data, c.ConfigMap.Data)
-	} else if c.ConfigMap.Data == nil {
+	} else if c.ConfigMap.Data == nil || len(c.ConfigMap.Data) == 0 {
 		return true
 	}
 	return false

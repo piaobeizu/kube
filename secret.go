@@ -156,7 +156,7 @@ func (s *Secret) DataEqual() bool {
 	secret, _ := s.Get()
 	if secret != nil {
 		return reflect.DeepEqual(secret.Data, s.Secret.Data)
-	} else if s.Secret.Data == nil {
+	} else if s.Secret.Data == nil || len(s.Secret.Data) == 0 {
 		return true
 	}
 	return false
