@@ -138,7 +138,7 @@ func (s *Service) CreateOrUpdate() error {
 	return s.Update()
 }
 
-func (s *Service) PortsEqual() bool {
+func (s *Service) Equal() bool {
 	service, err := s.Get()
 	if !errors.IsNotFound(err) {
 		return false
@@ -161,6 +161,13 @@ func (s *Service) PortsEqual() bool {
 			return false
 		}
 	}
-
+	if len(s.Spec.Selector) != len(service.Spec.Selector) {
+		return false
+	}
+	for k, v := range s.Spec.Selector {
+		if v != service.Spec.Selector[k] {
+			return false
+		}
+	}
 	return true
 }
