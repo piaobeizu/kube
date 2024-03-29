@@ -118,7 +118,7 @@ func (s *Service) Delete() error {
 		Delete(s.ctx, s.Name, metav1.DeleteOptions{})
 }
 
-func (s *Service) Get(replace bool) (*v1.Service, error) {
+func (s *Service) Get() (*v1.Service, error) {
 	return s.client.CoreV1().Services(s.Namespace).Get(s.ctx, s.Name, metav1.GetOptions{})
 }
 
@@ -136,4 +136,31 @@ func (s *Service) CreateOrUpdate() error {
 		return err
 	}
 	return s.Update()
+}
+
+func (s *Service) PortsEqual() bool {
+	service, err := s.Get()
+	if !errors.IsNotFound(err) {
+		return false
+	}
+	ports1 := map[string]v1.ServicePort{}
+	ports2 := map[string]v1.ServicePort{}
+	if service != nil {
+		for _, port := range service.Spec.Ports {
+			ports1[port.Name] = port
+		}
+	}
+	for _, port := range s.Spec.Ports {
+		ports2[port.Name] = port
+	}
+	if len(ports1) != len(ports2) {
+		return false
+	}
+	for k, v := range ports1 {
+		if v.Name != ports2[k].Name || v.Port != ports2[k].Port || v.TargetPort != ports2[k].TargetPort {
+			return false
+		}
+	}
+
+	return true
 }
