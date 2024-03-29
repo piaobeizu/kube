@@ -143,8 +143,8 @@ func (s *Secret) Empty() bool {
 }
 
 func (s *Secret) StringDataEqual() bool {
-	secret, _ := s.Get()
-	if secret != nil {
+	secret, err := s.Get()
+	if secret != nil && !errors.IsNotFound(err) {
 		return reflect.DeepEqual(secret.StringData, s.Secret.StringData)
 	} else if s.Secret.StringData == nil || len(s.Secret.Data) == 0 {
 		return true
@@ -153,8 +153,8 @@ func (s *Secret) StringDataEqual() bool {
 }
 
 func (s *Secret) DataEqual() bool {
-	secret, _ := s.Get()
-	if secret != nil {
+	secret, err := s.Get()
+	if secret != nil && !errors.IsNotFound(err) {
 		return reflect.DeepEqual(secret.Data, s.Secret.Data)
 	} else if s.Secret.Data == nil || len(s.Secret.Data) == 0 {
 		return true
