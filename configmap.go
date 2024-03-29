@@ -125,11 +125,12 @@ func (c *ConfigMap) Empty() bool {
 
 func (c *ConfigMap) DataEqual() bool {
 	cm, err := c.Get()
-	if cm != nil && !errors.IsNotFound(err) {
-		return reflect.DeepEqual(cm.Data, c.ConfigMap.Data)
-	} else if c.ConfigMap.Data == nil || len(c.ConfigMap.Data) == 0 {
+	if err != nil && !errors.IsNotFound(err) {
+		panic(err)
+	}
+	if len(cm.Data) == 0 && len(c.ConfigMap.Data) == 0 {
 		return true
 	}
-	return false
+	return reflect.DeepEqual(cm.Data, c.ConfigMap.Data)
 
 }
