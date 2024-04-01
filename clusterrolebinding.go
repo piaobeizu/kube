@@ -10,6 +10,7 @@ package kube
 
 import (
 	"context"
+	"reflect"
 
 	v1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -134,21 +135,8 @@ func (crb *ClusterRoleBinding) Equal() bool {
 	if !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(clusterRoleBinding.Labels) != len(crb.ClusterRoleBinding.Labels) {
-		return false
-	}
-	for k, v := range crb.ClusterRoleBinding.Labels {
-		if clusterRoleBinding.Labels[k] != v {
-			return false
-		}
-	}
-	if len(clusterRoleBinding.Annotations) != len(crb.ClusterRoleBinding.Annotations) {
-		return false
-	}
-	for k, v := range crb.ClusterRoleBinding.Annotations {
-		if clusterRoleBinding.Annotations[k] != v {
-			return false
-		}
-	}
-	return true
+	return reflect.DeepEqual(clusterRoleBinding.Labels, crb.ClusterRoleBinding.Labels) &&
+		reflect.DeepEqual(clusterRoleBinding.Annotations, crb.ClusterRoleBinding.Annotations) &&
+		reflect.DeepEqual(clusterRoleBinding.Subjects, crb.ClusterRoleBinding.Subjects) &&
+		reflect.DeepEqual(clusterRoleBinding.RoleRef, crb.ClusterRoleBinding.RoleRef)
 }
