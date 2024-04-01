@@ -132,7 +132,7 @@ func (sa *ServiceAccount) CreateOrUpdate() error {
 
 func (sa *ServiceAccount) Equal() bool {
 	serviceAccount, err := sa.Get()
-	if !errors.IsNotFound(err) {
+	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
 	return reflect.DeepEqual(serviceAccount.Labels, sa.ServiceAccount.Labels) &&

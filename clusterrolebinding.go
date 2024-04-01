@@ -132,7 +132,7 @@ func (crb *ClusterRoleBinding) CreateOrUpdate() error {
 
 func (crb *ClusterRoleBinding) Equal() bool {
 	clusterRoleBinding, err := crb.Get()
-	if !errors.IsNotFound(err) {
+	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
 	return reflect.DeepEqual(clusterRoleBinding.Labels, crb.ClusterRoleBinding.Labels) &&

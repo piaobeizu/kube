@@ -135,7 +135,7 @@ func (cr *ClusterRole) List() (*v1.ClusterRoleList, error) {
 
 func (cr *ClusterRole) Equal() bool {
 	clusterRole, err := cr.Get()
-	if !errors.IsNotFound(err) {
+	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
 	if len(clusterRole.Rules) == 0 && len(cr.Rules) == 0 {
