@@ -48,11 +48,17 @@ func (cr *ClusterRole) Metadata(name string) *ClusterRole {
 	return cr
 }
 func (cr *ClusterRole) Labels(labels map[string]string) *ClusterRole {
+	if cr.ClusterRole.Labels == nil {
+		cr.ClusterRole.Labels = make(map[string]string)
+	}
 	cr.ClusterRole.Labels = labels
 	return cr
 }
 
 func (cr *ClusterRole) Annotations(annotations map[string]string) *ClusterRole {
+	if cr.ClusterRole.Annotations == nil {
+		cr.ClusterRole.Annotations = make(map[string]string)
+	}
 	cr.ClusterRole.Annotations = annotations
 	return cr
 }
