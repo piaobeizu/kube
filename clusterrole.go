@@ -93,14 +93,16 @@ func (cr *ClusterRole) AggregationRule(matchLabels map[string]string) *ClusterRo
 	return cr
 }
 
-func (cr *ClusterRole) Create() (*v1.ClusterRole, error) {
-	return cr.client.RbacV1().ClusterRoles().Create(cr.ctx,
+func (cr *ClusterRole) Create() error {
+	_, err := cr.client.RbacV1().ClusterRoles().Create(cr.ctx,
 		cr.ClusterRole, metav1.CreateOptions{})
+	return err
 }
 
-func (cr *ClusterRole) Update() (*v1.ClusterRole, error) {
-	return cr.client.RbacV1().ClusterRoles().Update(cr.ctx,
+func (cr *ClusterRole) Update() error {
+	_, err := cr.client.RbacV1().ClusterRoles().Update(cr.ctx,
 		cr.ClusterRole, metav1.UpdateOptions{})
+	return err
 }
 
 func (cr *ClusterRole) Delete() error {
@@ -116,13 +118,13 @@ func (cr *ClusterRole) Empty() bool {
 	return errors.IsNotFound(err)
 }
 
-func (cr *ClusterRole) CreateOrUpdate() (*v1.ClusterRole, error) {
+func (cr *ClusterRole) CreateOrUpdate() error {
 	_, err := cr.client.RbacV1().ClusterRoles().Get(cr.ctx, cr.Name, metav1.GetOptions{})
 	if err != nil {
 		if errors.IsNotFound(err) {
 			return cr.Create()
 		}
-		return nil, err
+		return err
 	}
 	return cr.Update()
 }
