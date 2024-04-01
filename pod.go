@@ -233,3 +233,8 @@ func (pt *PodTemplate) ImagePullSecrets(secrets []string) *PodTemplate {
 	}
 	return pt
 }
+
+func (pt *PodTemplate) ServiceAccount(serviceAccount string) *PodTemplate {
+	pt.Template.Spec.ServiceAccountName = serviceAccount
+	return pt
+}
