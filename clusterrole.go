@@ -141,5 +141,7 @@ func (cr *ClusterRole) Equal() bool {
 	if len(clusterRole.Rules) == 0 && len(cr.Rules) == 0 {
 		return true
 	}
-	return reflect.DeepEqual(cr.ClusterRole.Rules, clusterRole.Rules)
+	return reflect.DeepEqual(cr.ClusterRole.Rules, clusterRole.Rules) &&
+		reflect.DeepEqual(cr.ClusterRole.Labels, clusterRole.Labels) &&
+		reflect.DeepEqual(cr.ClusterRole.Annotations, clusterRole.Annotations)
 }

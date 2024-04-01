@@ -10,6 +10,7 @@ package kube
 
 import (
 	"context"
+	"reflect"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -134,36 +135,7 @@ func (sa *ServiceAccount) Equal() bool {
 	if !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(serviceAccount.Labels) != len(sa.ServiceAccount.Labels) {
-		return false
-	}
-	for k, v := range sa.ServiceAccount.Labels {
-		if serviceAccount.Labels[k] != v {
-			return false
-		}
-	}
-
-	if len(serviceAccount.Annotations) != len(sa.ServiceAccount.Annotations) {
-		return false
-	}
-	for k, v := range sa.ServiceAccount.Annotations {
-		if serviceAccount.Annotations[k] != v {
-			return false
-		}
-	}
-	if len(serviceAccount.Secrets) != len(sa.Secrets) {
-		return false
-	}
-	for i, secret := range sa.Secrets {
-		if secret.Name != serviceAccount.Secrets[i].Name {
-			return false
-		}
-		if secret.Kind != serviceAccount.Secrets[i].Kind {
-			return false
-		}
-		if secret.Namespace != serviceAccount.Secrets[i].Namespace {
-			return false
-		}
-	}
-	return true
+	return reflect.DeepEqual(serviceAccount.Labels, sa.ServiceAccount.Labels) &&
+		reflect.DeepEqual(serviceAccount.Annotations, sa.ServiceAccount.Annotations) &&
+		reflect.DeepEqual(serviceAccount.Secrets, sa.Secrets)
 }
