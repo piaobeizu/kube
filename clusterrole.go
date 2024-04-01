@@ -35,7 +35,7 @@ func NewClusterRole(ctx context.Context) *ClusterRole {
 				APIVersion: "rbac.authorization.k8s.io/v1",
 			},
 			Rules:           []v1.PolicyRule{},
-			AggregationRule: &v1.AggregationRule{},
+			AggregationRule: nil,
 		},
 		ctx:      ctx,
 		LinkInfo: &LinkInfo{},
