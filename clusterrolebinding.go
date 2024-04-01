@@ -129,15 +129,15 @@ func (crb *ClusterRoleBinding) CreateOrUpdate() error {
 	return crb.Update()
 }
 
-func (crb *ClusterRoleBinding) Equal(labels map[string]string) bool {
+func (crb *ClusterRoleBinding) Equal() bool {
 	clusterRoleBinding, err := crb.Get()
 	if !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(clusterRoleBinding.Labels) != len(labels) {
+	if len(clusterRoleBinding.Labels) != len(crb.ClusterRoleBinding.Labels) {
 		return false
 	}
-	for k, v := range labels {
+	for k, v := range crb.ClusterRoleBinding.Labels {
 		if clusterRoleBinding.Labels[k] != v {
 			return false
 		}

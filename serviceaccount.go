@@ -129,15 +129,15 @@ func (sa *ServiceAccount) CreateOrUpdate() error {
 	return sa.Update()
 }
 
-func (sa *ServiceAccount) Equal(labels map[string]string) bool {
+func (sa *ServiceAccount) Equal() bool {
 	serviceAccount, err := sa.Get()
 	if !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(serviceAccount.Labels) != len(labels) {
+	if len(serviceAccount.Labels) != len(sa.ServiceAccount.Labels) {
 		return false
 	}
-	for k, v := range labels {
+	for k, v := range sa.ServiceAccount.Labels {
 		if serviceAccount.Labels[k] != v {
 			return false
 		}
