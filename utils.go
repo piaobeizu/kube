@@ -83,8 +83,8 @@ func flatten(obj any) map[string]FlatteItem {
 		case reflect.Func, reflect.Chan, reflect.Complex64, reflect.Complex128, reflect.Invalid:
 			panic("Unsupported type")
 		default:
-			result[strings.ToLower(prefix)] = FlatteItem{
-				Name: prefix,
+			result[strings.TrimLeft(strings.ToLower(prefix), ".")] = FlatteItem{
+				Name: strings.TrimLeft(strings.ToLower(prefix), "."),
 				Val:  o,
 				Kind: reflect.TypeOf(o).String(),
 			}

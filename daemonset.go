@@ -147,6 +147,6 @@ func (d *DaemonSet) Equal() bool {
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	keys := []string{"Spec", ""}
+	keys := []string{"Spec"}
 	return ResourceEqual(d.DaemonSet, dawmonSet, keys)
 }
