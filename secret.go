@@ -154,13 +154,13 @@ func (s *Secret) StringDataEqual() bool {
 	return reflect.DeepEqual(datas, s.Secret.StringData)
 }
 
-func (s *Secret) DataEqual() bool {
+func (s *Secret) Equal(keys []string) bool {
 	secret, err := s.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(secret.Data) == 0 && len(s.Secret.Data) == 0 {
-		return true
+	if len(keys) == 0 {
+		keys = []string{"Data", "Type", "StringData", "Immutable"}
 	}
-	return reflect.DeepEqual(secret.Data, s.Secret.Data)
+	return ResourceEqual(s.Secret, secret, keys)
 }

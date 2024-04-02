@@ -138,36 +138,13 @@ func (s *Service) CreateOrUpdate() error {
 	return s.Update()
 }
 
-func (s *Service) Equal() bool {
+func (s *Service) Equal(keys []string) bool {
 	service, err := s.Get()
 	if !errors.IsNotFound(err) {
 		return false
 	}
-	ports1 := map[string]v1.ServicePort{}
-	ports2 := map[string]v1.ServicePort{}
-	if service != nil {
-		for _, port := range service.Spec.Ports {
-			ports1[port.Name] = port
-		}
+	if len(keys) == 0 {
+		keys = []string{"Spec.Ports", "Spec.Selector", "Spec.Type", "Spec.ClusterIP", "Spec.SessionAffinity"}
 	}
-	for _, port := range s.Spec.Ports {
-		ports2[port.Name] = port
-	}
-	if len(ports1) != len(ports2) {
-		return false
-	}
-	for k, v := range ports1 {
-		if v.Name != ports2[k].Name || v.Port != ports2[k].Port || v.TargetPort != ports2[k].TargetPort {
-			return false
-		}
-	}
-	if len(s.Spec.Selector) != len(service.Spec.Selector) {
-		return false
-	}
-	for k, v := range s.Spec.Selector {
-		if v != service.Spec.Selector[k] {
-			return false
-		}
-	}
-	return true
+	return ResourceEqual(s.Service.Spec, service.Spec, keys)
 }

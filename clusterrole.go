@@ -145,12 +145,14 @@ func (cr *ClusterRole) List() (*v1.ClusterRoleList, error) {
 	return cr.client.RbacV1().ClusterRoles().List(cr.ctx, metav1.ListOptions{})
 }
 
-func (cr *ClusterRole) Equal() bool {
+func (cr *ClusterRole) Equal(keys []string) bool {
 	clusterRole, err := cr.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	keys := []string{"Rules.", "AggregationRule"}
+	if len(keys) == 0 {
+		keys = []string{"Rules.", "AggregationRule"}
+	}
 
 	return ResourceEqual(cr.ClusterRole, clusterRole, keys)
 

@@ -19,7 +19,6 @@ package kube
 import (
 	"context"
 	"fmt"
-	"reflect"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -163,17 +162,13 @@ func (d *Deployment) GetReplicas() (int32, error) {
 	return *deploy.Spec.Replicas, nil
 }
 
-func (d *Deployment) Equal() bool {
+func (d *Deployment) Equal(keys []string) bool {
 	deployment, err := d.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if deployment != nil {
-		if !reflect.DeepEqual(deployment.Labels, d.Deployment.Labels) ||
-			!reflect.DeepEqual(deployment.Annotations, d.Deployment.Annotations) ||
-			!reflect.DeepEqual(deployment.Spec.Selector, d.Deployment.Spec.Selector) {
-			return false
-		}
+	if len(keys) == 0 {
+		keys = []string{"Spec"}
 	}
-	return true
+	return ResourceEqual(d.Deployment.Spec, deployment.Spec, keys)
 }

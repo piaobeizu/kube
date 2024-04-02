@@ -142,11 +142,14 @@ func (d *DaemonSet) Rollout() error {
 	return err
 }
 
-func (d *DaemonSet) Equal() bool {
+func (d *DaemonSet) Equal(keys []string) bool {
 	dawmonSet, err := d.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	keys := []string{"Spec"}
-	return ResourceEqual(d.DaemonSet, dawmonSet, keys)
+	if len(keys) == 0 {
+		keys = []string{"Spec"}
+	}
+
+	return ResourceEqual(d.DaemonSet.Spec, dawmonSet.Spec, keys)
 }

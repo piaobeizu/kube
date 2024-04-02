@@ -10,7 +10,6 @@ package kube
 
 import (
 	"context"
-	"reflect"
 
 	"k8s.io/apimachinery/pkg/api/errors"
 
@@ -123,14 +122,14 @@ func (c *ConfigMap) Empty() bool {
 	return errors.IsNotFound(err)
 }
 
-func (c *ConfigMap) DataEqual() bool {
+func (c *ConfigMap) DataEqual(keys []string) bool {
 	cm, err := c.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(cm.Data) == 0 && len(c.ConfigMap.Data) == 0 {
-		return true
+	if len(keys) == 0 {
+		keys = []string{}
 	}
-	return reflect.DeepEqual(cm.Data, c.ConfigMap.Data)
+	return ResourceEqual(c.ConfigMap, cm, keys)
 
 }

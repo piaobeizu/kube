@@ -10,7 +10,6 @@ package kube
 
 import (
 	"context"
-	"reflect"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -130,12 +129,13 @@ func (sa *ServiceAccount) CreateOrUpdate() error {
 	return sa.Update()
 }
 
-func (sa *ServiceAccount) Equal() bool {
+func (sa *ServiceAccount) Equal(keys []string) bool {
 	serviceAccount, err := sa.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	return reflect.DeepEqual(serviceAccount.Labels, sa.ServiceAccount.Labels) &&
-		reflect.DeepEqual(serviceAccount.Annotations, sa.ServiceAccount.Annotations) &&
-		reflect.DeepEqual(serviceAccount.Secrets, sa.Secrets)
+	if len(keys) == 0 {
+		keys = []string{}
+	}
+	return ResourceEqual(sa.ServiceAccount, serviceAccount, keys)
 }
