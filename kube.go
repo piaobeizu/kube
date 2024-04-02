@@ -11,3 +11,9 @@ package kube
 type Interface interface {
 	Pod() PodInterface
 }
+
+type FlatteItem struct {
+	Name string
+	Val  any
+	Kind string
+}

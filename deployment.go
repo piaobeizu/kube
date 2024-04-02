@@ -19,6 +19,7 @@ package kube
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
@@ -28,9 +29,9 @@ import (
 )
 
 type Deployment struct {
-	ctx context.Context
 	*LinkInfo
 	*appsv1.Deployment
+	ctx    context.Context
 	client *KubeClient
 }
 
@@ -152,4 +153,27 @@ func (d *Deployment) Rollout() error {
 	_, err := d.client.AppsV1().Deployments(d.Namespace).Patch(d.ctx, d.Deployment.Name,
 		types.StrategicMergePatchType, []byte(data), metav1.PatchOptions{FieldManager: "kubectl-rollout"})
 	return err
+}
+
+func (d *Deployment) GetReplicas() (int32, error) {
+	deploy, err := d.Get()
+	if err != nil {
+		return 0, err
+	}
+	return *deploy.Spec.Replicas, nil
+}
+
+func (d *Deployment) Equal() bool {
+	deployment, err := d.Get()
+	if err != nil && !errors.IsNotFound(err) {
+		panic(err)
+	}
+	if deployment != nil {
+		if !reflect.DeepEqual(deployment.Labels, d.Deployment.Labels) ||
+			!reflect.DeepEqual(deployment.Annotations, d.Deployment.Annotations) ||
+			!reflect.DeepEqual(deployment.Spec.Selector, d.Deployment.Spec.Selector) {
+			return false
+		}
+	}
+	return true
 }

@@ -10,7 +10,6 @@ package kube
 
 import (
 	"context"
-	"reflect"
 
 	v1 "k8s.io/api/rbac/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -48,6 +47,9 @@ func (cr *ClusterRole) Metadata(name string) *ClusterRole {
 	return cr
 }
 func (cr *ClusterRole) Labels(labels map[string]string) *ClusterRole {
+	if len(labels) == 0 {
+		return cr
+	}
 	if cr.ClusterRole.Labels == nil {
 		cr.ClusterRole.Labels = make(map[string]string)
 	}
@@ -56,9 +58,13 @@ func (cr *ClusterRole) Labels(labels map[string]string) *ClusterRole {
 }
 
 func (cr *ClusterRole) Annotations(annotations map[string]string) *ClusterRole {
+	if len(annotations) == 0 {
+		return cr
+	}
 	if cr.ClusterRole.Annotations == nil {
 		cr.ClusterRole.Annotations = make(map[string]string)
 	}
+
 	cr.ClusterRole.Annotations = annotations
 	return cr
 }
@@ -70,6 +76,9 @@ func (cr *ClusterRole) Link(region, config string) *ClusterRole {
 	return cr
 }
 func (cr *ClusterRole) Rule(verbs []string, apiGroups []string, resoueces []string) *ClusterRole {
+	if len(verbs) == 0 || len(apiGroups) == 0 || len(resoueces) == 0 {
+		return cr
+	}
 	if cr.Rules == nil {
 		cr.Rules = make([]v1.PolicyRule, 0)
 	}
@@ -82,6 +91,9 @@ func (cr *ClusterRole) Rule(verbs []string, apiGroups []string, resoueces []stri
 }
 
 func (cr *ClusterRole) AggregationRule(matchLabels map[string]string) *ClusterRole {
+	if len(matchLabels) == 0 {
+		return cr
+	}
 	if cr.ClusterRole.AggregationRule == nil {
 		cr.ClusterRole.AggregationRule = &v1.AggregationRule{
 			ClusterRoleSelectors: []metav1.LabelSelector{},
@@ -138,10 +150,8 @@ func (cr *ClusterRole) Equal() bool {
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
 	}
-	if len(clusterRole.Rules) == 0 && len(cr.Rules) == 0 {
-		return true
-	}
-	return reflect.DeepEqual(cr.ClusterRole.Rules, clusterRole.Rules) &&
-		reflect.DeepEqual(cr.ClusterRole.Labels, clusterRole.Labels) &&
-		reflect.DeepEqual(cr.ClusterRole.Annotations, clusterRole.Annotations)
+	keys := []string{"Rules.", "AggregationRule"}
+
+	return ResourceEqual(cr.ClusterRole, clusterRole, keys)
+
 }
