@@ -58,35 +58,40 @@ func flatten(obj any) map[string]FlatteItem {
 	// mp := structToMap(obj)
 	var f func(any, string)
 	f = func(o any, prefix string) {
+
 		var mp = make(map[string]any)
 		objValue := reflect.ValueOf(o)
-		if objValue.Kind() == reflect.Ptr {
+		if reflect.TypeOf(o).Kind() == reflect.Ptr {
 			objValue = objValue.Elem()
 		}
 		kind := objValue.Kind()
 		switch kind {
-		case reflect.Map:
-			mp = o.(map[string]any)
 		case reflect.Slice, reflect.Array:
 			for i := 0; i < objValue.Len(); i++ {
 				mp[fmt.Sprintf("%d", i)] = objValue.Index(i).Interface()
 			}
 		case reflect.Struct:
-			objType := objValue.Type()
 			for i := 0; i < objValue.NumField(); i++ {
-				field := objType.Field(i)
+				field := objValue.Type().Field(i)
+				// 跳过私有属性
+				if field.PkgPath != "" {
+					continue
+				}
 				fieldValue := objValue.Field(i).Interface()
-				mp[field.Name] = fieldValue
+				jsonName := field.Tag.Get("json")
+				jsonName = strings.Replace(jsonName, ",inline", "", -1)
+				jsonName = strings.Replace(jsonName, ",omitempty", "", -1)
+				mp[jsonName] = fieldValue
 			}
 		case reflect.Interface:
 			mp[prefix] = o
-		case reflect.Func, reflect.Chan, reflect.Complex64, reflect.Complex128, reflect.Invalid:
-			panic("Unsupported type")
+		case reflect.Map, reflect.Func, reflect.Chan, reflect.Complex64, reflect.Complex128, reflect.Invalid:
+			return
 		default:
 			result[strings.TrimLeft(strings.ToLower(prefix), ".")] = FlatteItem{
 				Name: strings.TrimLeft(strings.ToLower(prefix), "."),
 				Val:  o,
-				Kind: reflect.TypeOf(o).String(),
+				Kind: kind.String(),
 			}
 		}
 		for k, v := range mp {
