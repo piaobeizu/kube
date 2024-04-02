@@ -141,3 +141,12 @@ func (d *DaemonSet) Rollout() error {
 	_, err := d.client.AppsV1().DaemonSets(d.Namespace).Update(d.ctx, d.DaemonSet, metav1.UpdateOptions{})
 	return err
 }
+
+func (d *DaemonSet) Equal() bool {
+	dawmonSet, err := d.Get()
+	if err != nil && !errors.IsNotFound(err) {
+		panic(err)
+	}
+	keys := []string{"Spec", ""}
+	return ResourceEqual(d.DaemonSet, dawmonSet, keys)
+}
