@@ -9,6 +9,7 @@
 package kube
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -19,6 +20,8 @@ func ResourceEqual(a, b any, keys []string) bool {
 	bFI := flatten(b)
 	aVals := make(map[string]FlatteItem, 0)
 	bVals := make(map[string]FlatteItem, 0)
+	fmt.Printf("aFI: %v\n", Struct2Json(aFI))
+	fmt.Printf("bFI: %v\n", Struct2Json(bFI))
 	for i, key := range keys {
 		keys[i] = strings.ToLower(key)
 	}
@@ -92,4 +95,17 @@ func flatten(obj any) map[string]FlatteItem {
 	}
 	f(obj, "")
 	return result
+}
+
+func Struct2Json(data any) string {
+	str, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	var content = string(str)
+	content = strings.Replace(content, "\\u003c", "<", -1)
+	content = strings.Replace(content, "\\u003e", ">", -1)
+	content = strings.Replace(content, "\\u0026", "&", -1)
+	content = strings.Replace(content, "\\\\", "", -1)
+	return content
 }
