@@ -151,9 +151,13 @@ func (cr *ClusterRole) Equal(keys []string) bool {
 		panic(err)
 	}
 	if len(keys) == 0 {
-		keys = []string{"Rules.", "AggregationRule"}
+		keys = []string{
+			"^Rules.*$",
+			"^AggregationRule.*$",
+		}
 	}
+	keys = append(keys, "^Metadata.Labels.*$")
+	keys = append(keys, "^Metadata.Annotations.*$")
 
 	return ResourceEqual(cr.ClusterRole, clusterRole, keys)
-
 }

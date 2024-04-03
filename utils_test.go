@@ -584,3 +584,7 @@ func TestResourceEqual(t *testing.T) {
 		fmt.Print("Resource equal\n")
 	}
 }
+
+func TestResourceEqual2(t *testing.T) {
+
+}
