@@ -122,7 +122,7 @@ func (c *ConfigMap) Empty() bool {
 	return errors.IsNotFound(err)
 }
 
-func (c *ConfigMap) DataEqual(keys []string) bool {
+func (c *ConfigMap) Equal(keys []string) bool {
 	cm, err := c.Get()
 	if err != nil && !errors.IsNotFound(err) {
 		panic(err)
