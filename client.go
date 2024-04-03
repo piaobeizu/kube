@@ -62,6 +62,9 @@ func BuildClusterConfig(kubeconfig string) (*rest.Config, error) {
 	if kubeconfig == "" {
 		return rest.InClusterConfig()
 	}
+	if strings.HasPrefix(kubeconfig, "unix://") {
+		return clientcmd.BuildConfigFromFlags("", kubeconfig[7:])
+	}
 	// kubeconfig := parsePath(region)
 	configPath := fmt.Sprintf("/tmp/%d", time.Now().Nanosecond())
 	if err := os.WriteFile(configPath, []byte(kubeconfig), 0644); err != nil {
@@ -106,11 +109,6 @@ func getClient(region, kubeconfig string) *kubernetes.Clientset {
 		return client
 	}
 }
-
-func intPtr(i int) *int          { return &i }
-func int32Ptr(i int32) *int32    { return &i }
-func int64Ptr(i int64) *int64    { return &i }
-func stringPtr(s string) *string { return &s }
 
 func parsePath(region string) string {
 	path := os.Getenv("KUBECONFIG")

@@ -145,7 +145,6 @@ func (d *DaemonSet) Rollout() error {
 func (d *DaemonSet) Equal(keys []string) bool {
 	daemonSet, err := d.Get()
 	if err != nil && !errors.IsNotFound(err) {
-		panic(err)
 	}
 	if len(keys) == 0 {
 		keys = []string{"Spec"}
