@@ -107,6 +107,25 @@ func (c *Container) Privileged(privileged bool) *Container {
 	return c
 }
 
+func (c *Container) Capabilitie(add v1.Capability, drop v1.Capability) *Container {
+	if c.Container.SecurityContext == nil {
+		c.Container.SecurityContext = &v1.SecurityContext{
+			Capabilities: &v1.Capabilities{
+				Add:  make([]v1.Capability, 0),
+				Drop: make([]v1.Capability, 0),
+			},
+		}
+	}
+	if add != "" {
+		c.Container.SecurityContext.Capabilities.Add = append(c.Container.SecurityContext.Capabilities.Add, add)
+	}
+	if drop != "" {
+		c.Container.SecurityContext.Capabilities.Drop = append(c.Container.SecurityContext.Capabilities.Drop, drop)
+	}
+
+	return c
+}
+
 func (c *Container) VolumeMount(name, mountPath string, readOnly bool) *Container {
 	if c.Container.VolumeMounts == nil {
 		c.Container.VolumeMounts = make([]v1.VolumeMount, 0)
