@@ -254,26 +254,26 @@ func (pt *PodTemplate) AutomountServiceAccountToken(auto bool) *PodTemplate {
 	return pt
 }
 
-func (pt *PodTemplate) NodeAffinity(affinity v1.NodeAffinity) error {
+func (pt *PodTemplate) NodeAffinity(affinity v1.NodeAffinity) *PodTemplate {
 	if pt.Template.Spec.Affinity == nil {
 		pt.Template.Spec.Affinity = &v1.Affinity{}
 	}
 	pt.Template.Spec.Affinity.NodeAffinity = &affinity
-	return nil
+	return pt
 }
 
-func (pt *PodTemplate) PodAffinity(affinity v1.PodAffinity) error {
+func (pt *PodTemplate) PodAffinity(affinity v1.PodAffinity) *PodTemplate {
 	if pt.Template.Spec.Affinity == nil {
 		pt.Template.Spec.Affinity = &v1.Affinity{}
 	}
 	pt.Template.Spec.Affinity.PodAffinity = &affinity
-	return nil
+	return pt
 }
 
-func (pt *PodTemplate) PodAntiAffinity(affinity v1.PodAntiAffinity) error {
+func (pt *PodTemplate) PodAntiAffinity(affinity v1.PodAntiAffinity) *PodTemplate {
 	if pt.Template.Spec.Affinity == nil {
 		pt.Template.Spec.Affinity = &v1.Affinity{}
 	}
 	pt.Template.Spec.Affinity.PodAntiAffinity = &affinity
-	return nil
+	return pt
 }
