@@ -12,6 +12,7 @@ import (
 	"context"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 type Volume struct {
@@ -58,10 +59,11 @@ func (v *Volume) ConfigMap(configMapName string, items []v1.KeyToPath, mode int3
 	return v
 }
 
-func (v *Volume) EmptyDir(medium string) *Volume {
+func (v *Volume) EmptyDir(medium string, size *resource.Quantity) *Volume {
 	v.VolumeSource = v1.VolumeSource{
 		EmptyDir: &v1.EmptyDirVolumeSource{
-			Medium: v1.StorageMedium(medium),
+			Medium:    v1.StorageMedium(medium),
+			SizeLimit: size,
 		},
 	}
 	return v

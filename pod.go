@@ -238,3 +238,13 @@ func (pt *PodTemplate) ServiceAccount(serviceAccount string) *PodTemplate {
 	pt.Template.Spec.ServiceAccountName = serviceAccount
 	return pt
 }
+
+func (pt *PodTemplate) PodSecurityContext(securityContext v1.PodSecurityContext) *PodTemplate {
+	pt.Template.Spec.SecurityContext = &securityContext
+	return pt
+}
+
+func (pt *PodTemplate) TerminationGracePeriodSeconds(seconds int64) *PodTemplate {
+	pt.Template.Spec.TerminationGracePeriodSeconds = &seconds
+	return pt
+}
