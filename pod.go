@@ -248,3 +248,32 @@ func (pt *PodTemplate) TerminationGracePeriodSeconds(seconds int64) *PodTemplate
 	pt.Template.Spec.TerminationGracePeriodSeconds = &seconds
 	return pt
 }
+
+func (pt *PodTemplate) AutomountServiceAccountToken(auto bool) *PodTemplate {
+	pt.Template.Spec.AutomountServiceAccountToken = &auto
+	return pt
+}
+
+func (pt *PodTemplate) NodeAffinity(affinity v1.NodeAffinity) error {
+	if pt.Template.Spec.Affinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{}
+	}
+	pt.Template.Spec.Affinity.NodeAffinity = &affinity
+	return nil
+}
+
+func (pt *PodTemplate) PodAffinity(affinity v1.PodAffinity) error {
+	if pt.Template.Spec.Affinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{}
+	}
+	pt.Template.Spec.Affinity.PodAffinity = &affinity
+	return nil
+}
+
+func (pt *PodTemplate) PodAntiAffinity(affinity v1.PodAntiAffinity) error {
+	if pt.Template.Spec.Affinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{}
+	}
+	pt.Template.Spec.Affinity.PodAntiAffinity = &affinity
+	return nil
+}
