@@ -191,19 +191,19 @@ func (pt *PodTemplate) Annotations(annotations map[string]string) *PodTemplate {
 	return pt
 }
 
-func (pt *PodTemplate) Container(container v1.Container) *PodTemplate {
+func (pt *PodTemplate) Container(container Container) *PodTemplate {
 	if pt.PodTemplate.Template.Spec.Containers == nil {
 		pt.PodTemplate.Template.Spec.Containers = make([]v1.Container, 0)
 	}
-	pt.PodTemplate.Template.Spec.Containers = append(pt.PodTemplate.Template.Spec.Containers, container)
+	pt.PodTemplate.Template.Spec.Containers = append(pt.PodTemplate.Template.Spec.Containers, *container.Container)
 	return pt
 }
 
-func (pt *PodTemplate) Volume(volumes v1.Volume) *PodTemplate {
+func (pt *PodTemplate) Volume(volume Volume) *PodTemplate {
 	if pt.PodTemplate.Template.Spec.Volumes == nil {
 		pt.PodTemplate.Template.Spec.Volumes = make([]v1.Volume, 0)
 	}
-	pt.PodTemplate.Template.Spec.Volumes = append(pt.PodTemplate.Template.Spec.Volumes, volumes)
+	pt.PodTemplate.Template.Spec.Volumes = append(pt.PodTemplate.Template.Spec.Volumes, *volume.Volume)
 	return pt
 }
 
