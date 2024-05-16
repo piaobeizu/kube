@@ -156,9 +156,15 @@ func (c *Container) ImagePullPolicy(policy v1.PullPolicy) *Container {
 	return c
 }
 
-func (container *Container) Resource(cpu, memory, gpu, ephemeralStorage uint, gpuType string) *Container {
+func (container *Container) Requests(cpu, memory, gpu, ephemeralStorage uint, gpuType string) *Container {
 	resources := resourceList(cpu, memory, gpu, ephemeralStorage, gpuType)
 	container.Container.Resources.Requests = resources
+	return container
+}
+
+func (container *Container) Limits(cpu, memory, gpu, ephemeralStorage uint, gpuType string) *Container {
+	resources := resourceList(cpu, memory, gpu, ephemeralStorage, gpuType)
+	container.Container.Resources.Limits = resources
 	return container
 }
 
