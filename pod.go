@@ -269,10 +269,11 @@ func (pt *PodTemplate) NodeSelector(selecotrs map[string]string) *PodTemplate {
 }
 
 func (pt *PodTemplate) RequiredDuringSchedulingIgnoredDuringExecution(selector NodeSelector) *PodTemplate {
-	if pt.Template.Spec.Affinity == nil && pt.Template.Spec.Affinity.NodeAffinity == nil {
-		pt.Template.Spec.Affinity = &v1.Affinity{
-			NodeAffinity: &v1.NodeAffinity{},
-		}
+	if pt.Template.Spec.Affinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{}
+	}
+	if pt.Template.Spec.Affinity.NodeAffinity == nil {
+		pt.Template.Spec.Affinity.NodeAffinity = &v1.NodeAffinity{}
 	}
 	pt.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = selector.NodeSelector
 	return pt
@@ -288,7 +289,7 @@ func (pt *PodTemplate) PreferredDuringSchedulingIgnoredDuringExecution(weight in
 	}
 	pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution, v1.PreferredSchedulingTerm{
 		Weight:     weight,
-		Preference: selectorTerm.NodeSelectorTerm,
+		Preference: *selectorTerm.NodeSelectorTerm,
 	})
 	return pt
 }
