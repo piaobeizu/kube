@@ -222,8 +222,17 @@ func (pt *PodTemplate) SecurityContext(user, group, fsGroup int64) *PodTemplate 
 	return pt
 }
 
-func (pt *PodTemplate) Toleration(toleration []v1.Toleration) *PodTemplate {
-	pt.PodTemplate.Template.Spec.Tolerations = toleration
+func (pt *PodTemplate) Toleration(key string, operator v1.TolerationOperator, value string, effect v1.TaintEffect, tolerationSeconds int64) *PodTemplate {
+	if pt.PodTemplate.Template.Spec.Tolerations == nil {
+		pt.PodTemplate.Template.Spec.Tolerations = make([]v1.Toleration, 0)
+	}
+	pt.PodTemplate.Template.Spec.Tolerations = append(pt.PodTemplate.Template.Spec.Tolerations, v1.Toleration{
+		Key:               key,
+		Operator:          operator,
+		Value:             value,
+		Effect:            effect,
+		TolerationSeconds: &tolerationSeconds,
+	})
 	return pt
 }
 
