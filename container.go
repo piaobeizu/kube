@@ -169,22 +169,18 @@ func (container *Container) Limits(cpu, memory, gpu, ephemeralStorage uint, gpuT
 }
 
 func resourceList(cpu, memory, gpu, ephemeralStorage uint, gpuType string) v1.ResourceList {
-	if cpu == 0 {
-		cpu = 200
+	resources := v1.ResourceList{}
+	if cpu > 0 {
+		cpuResource := fmt.Sprintf("%dm", cpu)
+		resources[ResourceNvidiaGPU] = resource.MustParse(cpuResource)
 	}
-	if memory == 0 {
-		memory = 1
+	if memory > 0 {
+		memoryResource := fmt.Sprintf("%dMi", memory)
+		resources[v1.ResourceMemory] = resource.MustParse(memoryResource)
 	}
-	if ephemeralStorage == 0 {
-		ephemeralStorage = 20
-	}
-	cpuResource := fmt.Sprintf("%dm", cpu)
-	memoryResource := fmt.Sprintf("%dMi", memory)
-	ephemeralStorageResource := fmt.Sprintf("%dGi", ephemeralStorage)
-	resources := v1.ResourceList{
-		v1.ResourceCPU:              resource.MustParse(cpuResource),
-		v1.ResourceMemory:           resource.MustParse(memoryResource),
-		v1.ResourceEphemeralStorage: resource.MustParse(ephemeralStorageResource),
+	if ephemeralStorage > 0 {
+		ephemeralStorageResource := fmt.Sprintf("%dGi", ephemeralStorage)
+		resources[v1.ResourceEphemeralStorage] = resource.MustParse(ephemeralStorageResource)
 	}
 	if gpu > 0 {
 		if gpuType == ResourceTianshuGPU {
@@ -195,7 +191,6 @@ func resourceList(cpu, memory, gpu, ephemeralStorage uint, gpuType string) v1.Re
 			gpuResource := fmt.Sprintf("%d", gpu)
 			resources[ResourceNvidiaGPU] = resource.MustParse(gpuResource)
 		}
-
 	}
 	return resources
 }
