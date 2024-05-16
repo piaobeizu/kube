@@ -9,6 +9,7 @@
 package kube
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"regexp"
@@ -137,4 +138,28 @@ func flatten(obj any) map[string]FlatteItem {
 	}
 	f(obj, "")
 	return result
+}
+
+func FormatStruct(data any, indent bool) string {
+	if data == nil {
+		return ""
+	}
+	var (
+		bytes []byte
+		err   error
+	)
+	if !indent {
+		bytes, err = json.Marshal(data)
+	} else {
+		bytes, err = json.MarshalIndent(data, "", "  ")
+	}
+	if err != nil {
+		panic(err)
+	}
+	var content = string(bytes)
+	content = strings.Replace(content, "\\u003c", "<", -1)
+	content = strings.Replace(content, "\\u003e", ">", -1)
+	content = strings.Replace(content, "\\u0026", "&", -1)
+	content = strings.Replace(content, "\\\\", "", -1)
+	return content
 }
