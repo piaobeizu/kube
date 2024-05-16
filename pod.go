@@ -288,7 +288,7 @@ func (pt *PodTemplate) PreferredDuringSchedulingIgnoredDuringExecution(weight in
 	}
 	pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution, v1.PreferredSchedulingTerm{
 		Weight:     weight,
-		Preference: *selectorTerm.NodeSelectorTerm,
+		Preference: selectorTerm.NodeSelectorTerm,
 	})
 	return pt
 }

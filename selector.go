@@ -25,17 +25,17 @@ func NewNodeSelector() *NodeSelector {
 }
 
 func (n *NodeSelector) NodeSelectorTerm(term NodeSelectorTerm) *NodeSelector {
-	n.NodeSelectorTerms = append(n.NodeSelectorTerms, *term.NodeSelectorTerm)
+	n.NodeSelectorTerms = append(n.NodeSelectorTerms, term.NodeSelectorTerm)
 	return n
 }
 
 type NodeSelectorTerm struct {
-	*v1.NodeSelectorTerm
+	v1.NodeSelectorTerm
 }
 
 func NewNodeSelectorTerm() *NodeSelectorTerm {
 	return &NodeSelectorTerm{
-		NodeSelectorTerm: &v1.NodeSelectorTerm{
+		NodeSelectorTerm: v1.NodeSelectorTerm{
 			MatchExpressions: []v1.NodeSelectorRequirement{},
 			MatchFields:      []v1.NodeSelectorRequirement{},
 		},
