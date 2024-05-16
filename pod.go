@@ -263,11 +263,33 @@ func (pt *PodTemplate) AutomountServiceAccountToken(auto bool) *PodTemplate {
 	return pt
 }
 
-func (pt *PodTemplate) NodeAffinity(affinity v1.NodeAffinity) *PodTemplate {
-	if pt.Template.Spec.Affinity == nil {
-		pt.Template.Spec.Affinity = &v1.Affinity{}
+func (pt *PodTemplate) NodeSelector(selecotrs map[string]string) *PodTemplate {
+	pt.Template.Spec.NodeSelector = selecotrs
+	return pt
+}
+
+func (pt *PodTemplate) RequiredDuringSchedulingIgnoredDuringExecution(selector NodeSelector) *PodTemplate {
+	if pt.Template.Spec.Affinity == nil && pt.Template.Spec.Affinity.NodeAffinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{},
+		}
 	}
-	pt.Template.Spec.Affinity.NodeAffinity = &affinity
+	pt.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = selector.NodeSelector
+	return pt
+}
+
+func (pt *PodTemplate) PreferredDuringSchedulingIgnoredDuringExecution(weight int32, selectorTerm NodeSelectorTerm) *PodTemplate {
+	if pt.Template.Spec.Affinity == nil && pt.Template.Spec.Affinity.NodeAffinity == nil {
+		pt.Template.Spec.Affinity = &v1.Affinity{
+			NodeAffinity: &v1.NodeAffinity{
+				PreferredDuringSchedulingIgnoredDuringExecution: []v1.PreferredSchedulingTerm{},
+			},
+		}
+	}
+	pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(pt.Template.Spec.Affinity.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution, v1.PreferredSchedulingTerm{
+		Weight:     weight,
+		Preference: *selectorTerm.NodeSelectorTerm,
+	})
 	return pt
 }
 
