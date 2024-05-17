@@ -13,25 +13,31 @@ import (
 	"fmt"
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 )
 
-func ResourceEqual(a, b any, keys []string) bool {
+// type Equal struct {
+// 	Key      string
+// 	SortName string
+// }
+
+func ResourceEqual(a, b any, equals []string) bool {
 	aFI := flatten(a)
 	bFI := flatten(b)
 	aVals := make(map[string]FlatteItem, 0)
 	bVals := make(map[string]FlatteItem, 0)
-	for i, key := range keys {
-		keys[i] = strings.ToLower(key)
+	for i, equal := range equals {
+		equals[i] = strings.ToLower(equal)
 	}
-	for _, key := range keys {
+	for _, equal := range equals {
 		for k, item := range aFI {
-			if regexp.MustCompile(key).MatchString(k) {
+			if regexp.MustCompile(equal).MatchString(k) {
 				aVals[k] = item
 			}
 		}
 		for k, item := range bFI {
-			if regexp.MustCompile(key).MatchString(k) {
+			if regexp.MustCompile(equal).MatchString(k) {
 				bVals[k] = item
 			}
 		}
@@ -93,7 +99,6 @@ func flatten(obj any) map[string]FlatteItem {
 	// mp := structToMap(obj)
 	var f func(any, string)
 	f = func(o any, prefix string) {
-
 		var mp = make(map[string]any)
 		objValue := reflect.ValueOf(o)
 		if reflect.TypeOf(o).Kind() == reflect.Ptr {
@@ -102,6 +107,16 @@ func flatten(obj any) map[string]FlatteItem {
 		kind := objValue.Kind()
 		switch kind {
 		case reflect.Slice, reflect.Array:
+			if objValue.Len() == 0 {
+				return
+			}
+			typeOfA := objValue.Index(0).Type()
+			for i := 0; i < objValue.NumField(); i++ {
+				fieldType := typeOfA.Field(i)
+				sort.Slice(objValue, func(i, j int) bool {
+					return reflectCmp(objValue.Index(i).Interface(), objValue.Index(j).Interface(), fieldType.Name)
+				})
+			}
 			for i := 0; i < objValue.Len(); i++ {
 				mp[fmt.Sprintf("%d", i)] = objValue.Index(i).Interface()
 			}
@@ -120,7 +135,7 @@ func flatten(obj any) map[string]FlatteItem {
 			}
 		case reflect.Interface:
 			mp[prefix] = o
-		case reflect.Map, reflect.Func, reflect.Chan, reflect.Complex64, reflect.Complex128, reflect.Invalid:
+		case reflect.Func, reflect.Chan, reflect.Complex64, reflect.Complex128, reflect.Invalid:
 			return
 		default:
 			name := strings.Trim(prefix, ".")
@@ -162,4 +177,20 @@ func FormatStruct(data any, indent bool) string {
 	content = strings.Replace(content, "\\u0026", "&", -1)
 	content = strings.Replace(content, "\\\\", "", -1)
 	return content
+}
+
+func reflectCmp(i, j interface{}, fieldName string) bool {
+	valI := reflect.ValueOf(i).FieldByName(fieldName).Interface()
+	valJ := reflect.ValueOf(j).FieldByName(fieldName).Interface()
+	switch s := valI.(type) {
+	case string:
+		return s < valJ.(string)
+	case float64:
+		return s < valJ.(float64)
+	case int:
+		return s < valJ.(int)
+	default:
+		fmt.Println("The type is unknown")
+	}
+	return true
 }

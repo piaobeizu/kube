@@ -268,7 +268,7 @@ func (pt *PodTemplate) NodeSelector(selecotrs map[string]string) *PodTemplate {
 	return pt
 }
 
-func (pt *PodTemplate) RequiredDuringSchedulingIgnoredDuringExecution(selector NodeSelector) *PodTemplate {
+func (pt *PodTemplate) RequiredDuringSchedulingIgnoredDuringExecution(selector *NodeSelector) *PodTemplate {
 	if pt.Template.Spec.Affinity == nil {
 		pt.Template.Spec.Affinity = &v1.Affinity{}
 	}
