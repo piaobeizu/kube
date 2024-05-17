@@ -22,6 +22,10 @@ import (
 // 	SortName string
 // }
 
+var sortKeys = []string{
+	"EnvVar",
+}
+
 func ResourceEqual(a, b any, equals []string) bool {
 	aFI := flatten(a)
 	bFI := flatten(b)
@@ -38,41 +42,6 @@ func ResourceEqual(a, b any, equals []string) bool {
 		}
 		for k, item := range bFI {
 			if regexp.MustCompile(equal).MatchString(k) {
-				bVals[k] = item
-			}
-		}
-	}
-	if len(aVals) != len(bVals) {
-		return false
-	}
-	for k, aval := range aVals {
-		if _, ok := bVals[k]; !ok {
-			return false
-		}
-		if aval.Kind != bVals[k].Kind {
-			return false
-		}
-		if !reflect.DeepEqual(aval.Val, bVals[k].Val) {
-			return false
-		}
-	}
-	return true
-}
-
-func resourceEqual1(aFI, bFI map[string]FlatteItem, keys []string) bool {
-	aVals := make(map[string]FlatteItem, 0)
-	bVals := make(map[string]FlatteItem, 0)
-	for i, key := range keys {
-		keys[i] = strings.ToLower(key)
-	}
-	for _, key := range keys {
-		for k, item := range aFI {
-			if regexp.MustCompile(key).MatchString(k) {
-				aVals[k] = item
-			}
-		}
-		for k, item := range bFI {
-			if regexp.MustCompile(key).MatchString(k) {
 				bVals[k] = item
 			}
 		}
@@ -111,14 +80,17 @@ func flatten(obj any) map[string]FlatteItem {
 				return
 			}
 			typeOfA := objValue.Index(0).Type()
-			for i := 0; i < objValue.NumField(); i++ {
-				fieldType := typeOfA.Field(i)
-				sort.Slice(objValue, func(i, j int) bool {
-					return reflectCmp(objValue.Index(i).Interface(), objValue.Index(j).Interface(), fieldType.Name)
-				})
+			slice := reflect.MakeSlice(reflect.SliceOf(typeOfA), objValue.Len(), objValue.Len())
+			reflect.Copy(slice, objValue)
+			for _, key := range sortKeys {
+				if typeOfA.Name() == key {
+					sort.Slice(slice.Interface(), func(i, j int) bool {
+						return reflectCmp(slice.Index(i).Interface(), slice.Index(j).Interface(), typeOfA.Field(0).Name)
+					})
+				}
 			}
-			for i := 0; i < objValue.Len(); i++ {
-				mp[fmt.Sprintf("%d", i)] = objValue.Index(i).Interface()
+			for i := 0; i < slice.Len(); i++ {
+				mp[fmt.Sprintf("%d", i)] = slice.Index(i).Interface()
 			}
 		case reflect.Struct:
 			for i := 0; i < objValue.NumField(); i++ {
@@ -187,8 +159,24 @@ func reflectCmp(i, j interface{}, fieldName string) bool {
 		return s < valJ.(string)
 	case float64:
 		return s < valJ.(float64)
-	case int:
-		return s < valJ.(int)
+	case float32:
+		return s < valJ.(float32)
+	case int64:
+		return s < valJ.(int64)
+	case int32:
+		return s < valJ.(int32)
+	case int16:
+		return s < valJ.(int16)
+	case int8:
+		return s < valJ.(int8)
+	case uint64:
+		return s < valJ.(uint64)
+	case uint32:
+		return s < valJ.(uint32)
+	case uint16:
+		return s < valJ.(uint16)
+	case uint8:
+		return s < valJ.(uint8)
 	default:
 		fmt.Println("The type is unknown")
 	}
