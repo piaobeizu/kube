@@ -163,17 +163,20 @@ func (container *Container) Requests(cpu, memory, gpu, ephemeralStorage uint, gp
 	return container
 }
 
-func (container *Container) LivenessProbeExec(command []string) *Container {
+func (container *Container) LivenessProbeExec(command []string, periodSeconds int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
 	container.Container.LivenessProbe.Exec = &v1.ExecAction{
 		Command: command,
 	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+	}
 	return container
 }
 
-func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme v1.URIScheme) *Container {
+func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme v1.URIScheme, periodSeconds int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
@@ -191,10 +194,13 @@ func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme
 			IntVal: port,
 		},
 	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+	}
 	return container
 }
 
-func (container *Container) LivenessProbeTcpSocket(port int32) *Container {
+func (container *Container) LivenessProbeTcpSocket(port int32, periodSeconds int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
@@ -203,6 +209,62 @@ func (container *Container) LivenessProbeTcpSocket(port int32) *Container {
 			Type:   intstr.Int,
 			IntVal: port,
 		},
+	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+	}
+	return container
+}
+
+func (container *Container) RedinessProbeExec(command []string, periodSeconds int32) *Container {
+	if container.Container.ReadinessProbe == nil {
+		container.Container.ReadinessProbe = &v1.Probe{}
+	}
+	container.Container.ReadinessProbe.Exec = &v1.ExecAction{
+		Command: command,
+	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+	}
+	return container
+}
+
+func (container *Container) RedinessProbeHttpGet(path string, port int32, scheme v1.URIScheme, periodSeconds int32) *Container {
+	if container.Container.ReadinessProbe == nil {
+		container.Container.ReadinessProbe = &v1.Probe{}
+	}
+	if path == "" {
+		path = "/"
+	}
+	if scheme == "" {
+		scheme = v1.URISchemeHTTP
+	}
+	container.Container.ReadinessProbe.HTTPGet = &v1.HTTPGetAction{
+		Path:   path,
+		Scheme: scheme,
+		Port: intstr.IntOrString{
+			Type:   intstr.Int,
+			IntVal: port,
+		},
+	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+	}
+	return container
+}
+
+func (container *Container) RedinessProbeTcpSocket(port int32, periodSeconds int32) *Container {
+	if container.Container.ReadinessProbe == nil {
+		container.Container.ReadinessProbe = &v1.Probe{}
+	}
+	container.Container.ReadinessProbe.TCPSocket = &v1.TCPSocketAction{
+		Port: intstr.IntOrString{
+			Type:   intstr.Int,
+			IntVal: port,
+		},
+	}
+	if periodSeconds > 0 {
+		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
 	}
 	return container
 }
