@@ -14,6 +14,7 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 const (
@@ -159,6 +160,50 @@ func (c *Container) ImagePullPolicy(policy v1.PullPolicy) *Container {
 func (container *Container) Requests(cpu, memory, gpu, ephemeralStorage uint, gpuType string) *Container {
 	resources := resourceList(cpu, memory, gpu, ephemeralStorage, gpuType)
 	container.Container.Resources.Requests = resources
+	return container
+}
+
+func (container *Container) LivenessProbeExec(command []string) *Container {
+	if container.Container.LivenessProbe == nil {
+		container.Container.LivenessProbe = &v1.Probe{}
+	}
+	container.Container.LivenessProbe.Exec = &v1.ExecAction{
+		Command: command,
+	}
+	return container
+}
+
+func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme v1.URIScheme) *Container {
+	if container.Container.LivenessProbe == nil {
+		container.Container.LivenessProbe = &v1.Probe{}
+	}
+	if path == "" {
+		path = "/"
+	}
+	if scheme == "" {
+		scheme = v1.URISchemeHTTP
+	}
+	container.Container.LivenessProbe.HTTPGet = &v1.HTTPGetAction{
+		Path:   path,
+		Scheme: scheme,
+		Port: intstr.IntOrString{
+			Type:   intstr.Int,
+			IntVal: port,
+		},
+	}
+	return container
+}
+
+func (container *Container) LivenessProbeTcpSocket(port int32) *Container {
+	if container.Container.LivenessProbe == nil {
+		container.Container.LivenessProbe = &v1.Probe{}
+	}
+	container.Container.LivenessProbe.TCPSocket = &v1.TCPSocketAction{
+		Port: intstr.IntOrString{
+			Type:   intstr.Int,
+			IntVal: port,
+		},
+	}
 	return container
 }
 

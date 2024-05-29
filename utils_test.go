@@ -578,7 +578,7 @@ func TestResourceEqual(t *testing.T) {
 	keys := []string{
 		"^template.spec.containers.*.image$",
 	}
-	if !resourceEqual1(a, b, keys) {
+	if !ResourceEqual(a, b, keys) {
 		fmt.Print("Resource not equal\n")
 	} else {
 		fmt.Print("Resource equal\n")
