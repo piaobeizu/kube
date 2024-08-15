@@ -48,8 +48,8 @@ func (n *Node) Link(region, config string) *Node {
 	return n
 }
 
-func (n *Node) Metadata(name, namespace string) *Node {
-	n.Name, n.Namespace = name, namespace
+func (n *Node) Metadata(name string) *Node {
+	n.Name = name
 	return n
 }
 
@@ -92,6 +92,10 @@ func (n *Node) Update() error {
 
 func (n *Node) Get() (*v1.Node, error) {
 	return n.client.CoreV1().Nodes().Get(n.ctx, n.Name, metav1.GetOptions{})
+}
+
+func (n *Node) List() (*v1.NodeList, error) {
+	return n.client.CoreV1().Nodes().List(n.ctx, metav1.ListOptions{})
 }
 
 func (n *Node) CreateOrUpdate() error {
