@@ -94,6 +94,15 @@ func (n *Node) Get() (*v1.Node, error) {
 	return n.client.CoreV1().Nodes().Get(n.ctx, n.Name, metav1.GetOptions{})
 }
 
+func (n *Node) Fetch() (*Node, error) {
+	node, err := n.client.CoreV1().Nodes().Get(n.ctx, n.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+	}
+	n.Node = node
+	return n, nil
+}
+
 func (n *Node) List() (*v1.NodeList, error) {
 	return n.client.CoreV1().Nodes().List(n.ctx, metav1.ListOptions{})
 }
