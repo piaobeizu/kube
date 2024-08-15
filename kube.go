@@ -8,6 +8,8 @@
 
 package kube
 
+import "k8s.io/client-go/kubernetes"
+
 type Interface interface {
 	Pod() PodInterface
 }
@@ -16,4 +18,13 @@ type FlatteItem struct {
 	Name string
 	Val  any
 	Kind string
+}
+
+func KubeExist(kubeconfig string) bool {
+	cfg, err := BuildClusterConfig(kubeconfig)
+	if err != nil {
+		return false
+	}
+	_, err = kubernetes.NewForConfig(cfg)
+	return err == nil
 }

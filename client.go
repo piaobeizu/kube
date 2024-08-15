@@ -15,6 +15,7 @@ import (
 	"sync"
 	"time"
 
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
 	typev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/rest"
@@ -62,8 +63,9 @@ func BuildClusterConfig(kubeconfig string) (*rest.Config, error) {
 	if kubeconfig == "" {
 		return rest.InClusterConfig()
 	}
-	if strings.HasPrefix(kubeconfig, "unix://") {
-		return clientcmd.BuildConfigFromFlags("", kubeconfig[7:])
+	var cfg rest.Config
+	if err := yaml.Unmarshal([]byte(kubeconfig), &cfg); err != nil {
+		return clientcmd.BuildConfigFromFlags("", kubeconfig)
 	}
 	// kubeconfig := parsePath(region)
 	configPath := fmt.Sprintf("/tmp/%d", time.Now().Nanosecond())
