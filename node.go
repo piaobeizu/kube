@@ -107,6 +107,20 @@ func (n *Node) List() (*v1.NodeList, error) {
 	return n.client.CoreV1().Nodes().List(n.ctx, metav1.ListOptions{})
 }
 
+func (n *Node) ListPods() ([]v1.Pod, error) {
+	podList, err := n.client.CoreV1().Pods("").List(n.ctx, metav1.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	var podsOnNode []v1.Pod
+	for _, pod := range podList.Items {
+		if pod.Spec.NodeName == n.Name {
+			podsOnNode = append(podsOnNode, pod)
+		}
+	}
+	return podsOnNode, nil
+}
+
 func (n *Node) CreateOrUpdate() error {
 	_, err := n.client.CoreV1().Nodes().Get(n.ctx, n.Name, metav1.GetOptions{})
 	if err != nil {

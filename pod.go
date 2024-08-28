@@ -4,6 +4,7 @@ import (
 	"context"
 
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -126,23 +127,30 @@ func (p *Pod) Update() error {
 	return err
 }
 
-func (p *Pod) Get(replace bool) (*Pod, error) {
-	pods := p.client.CoreV1().Pods(p.Namespace)
-	pod, err := pods.Get(p.ctx, p.Pod.Name, metav1.GetOptions{})
-	if replace {
-		p.Pod = pod
+func (p *Pod) Get() (*v1.Pod, error) {
+	return p.client.CoreV1().Pods(p.Namespace).Get(p.ctx, p.Pod.Name, metav1.GetOptions{})
+}
+
+func (p *Pod) List() (*v1.PodList, error) {
+	return p.client.CoreV1().Pods("").List(p.ctx, metav1.ListOptions{})
+}
+
+func (p *Pod) Fetch(replace bool) (*Pod, error) {
+	pod, err := p.client.CoreV1().Pods(p.Namespace).Get(p.ctx, p.Pod.Name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
 	}
+	p.Pod = pod
 	return p, err
 
 }
 
 func (p *Pod) CreateOrUpdate() error {
-	pod, err := p.Get(false)
+	_, err := p.client.CoreV1().Pods(p.Namespace).Get(p.ctx, p.Pod.Name, metav1.GetOptions{})
 	if err != nil {
-		return err
-	}
-	if pod.Pod == nil {
-		return p.Create()
+		if errors.IsNotFound(err) {
+			return p.Create()
+		}
 	}
 	return p.Update()
 }
