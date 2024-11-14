@@ -163,23 +163,26 @@ func (container *Container) Requests(cpu, memory, gpu, ephemeralStorage uint, gp
 	return container
 }
 
-func (container *Container) LivenessProbeExec(command []string, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) LivenessProbeExec(command []string, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
 	container.Container.LivenessProbe.Exec = &v1.ExecAction{
 		Command: command,
 	}
+	if initialDelaySeconds > 0 {
+		container.Container.LivenessProbe.InitialDelaySeconds = initialDelaySeconds
+	}
 	if periodSeconds > 0 {
-		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+		container.Container.LivenessProbe.PeriodSeconds = periodSeconds
 	}
 	if failureThreshold > 0 {
-		container.Container.ReadinessProbe.FailureThreshold = failureThreshold
+		container.Container.LivenessProbe.FailureThreshold = failureThreshold
 	}
 	return container
 }
 
-func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme v1.URIScheme, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme v1.URIScheme, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
@@ -197,16 +200,19 @@ func (container *Container) LivenessProbeHttpGet(path string, port int32, scheme
 			IntVal: port,
 		},
 	}
+	if initialDelaySeconds > 0 {
+		container.Container.LivenessProbe.InitialDelaySeconds = initialDelaySeconds
+	}
 	if periodSeconds > 0 {
-		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+		container.Container.LivenessProbe.PeriodSeconds = periodSeconds
 	}
 	if failureThreshold > 0 {
-		container.Container.ReadinessProbe.FailureThreshold = failureThreshold
+		container.Container.LivenessProbe.FailureThreshold = failureThreshold
 	}
 	return container
 }
 
-func (container *Container) LivenessProbeTcpSocket(port int32, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) LivenessProbeTcpSocket(port int32, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.LivenessProbe == nil {
 		container.Container.LivenessProbe = &v1.Probe{}
 	}
@@ -216,22 +222,28 @@ func (container *Container) LivenessProbeTcpSocket(port int32, periodSeconds, fa
 			IntVal: port,
 		},
 	}
+	if initialDelaySeconds > 0 {
+		container.Container.LivenessProbe.InitialDelaySeconds = initialDelaySeconds
+	}
 	if periodSeconds > 0 {
-		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
+		container.Container.LivenessProbe.PeriodSeconds = periodSeconds
 	}
 	if failureThreshold > 0 {
-		container.Container.ReadinessProbe.FailureThreshold = failureThreshold
+		container.Container.LivenessProbe.FailureThreshold = failureThreshold
 	}
 	return container
 }
 
-func (container *Container) RedinessProbeExec(command []string, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) RedinessProbeExec(command []string, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.ReadinessProbe == nil {
 		container.Container.ReadinessProbe = &v1.Probe{}
 	}
 	container.Container.ReadinessProbe.Exec = &v1.ExecAction{
 		Command: command,
 	}
+	if initialDelaySeconds > 0 {
+		container.Container.ReadinessProbe.InitialDelaySeconds = initialDelaySeconds
+	}
 	if periodSeconds > 0 {
 		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
 	}
@@ -241,7 +253,7 @@ func (container *Container) RedinessProbeExec(command []string, periodSeconds, f
 	return container
 }
 
-func (container *Container) RedinessProbeHttpGet(path string, port int32, scheme v1.URIScheme, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) RedinessProbeHttpGet(path string, port int32, scheme v1.URIScheme, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.ReadinessProbe == nil {
 		container.Container.ReadinessProbe = &v1.Probe{}
 	}
@@ -259,6 +271,9 @@ func (container *Container) RedinessProbeHttpGet(path string, port int32, scheme
 			IntVal: port,
 		},
 	}
+	if initialDelaySeconds > 0 {
+		container.Container.ReadinessProbe.InitialDelaySeconds = initialDelaySeconds
+	}
 	if periodSeconds > 0 {
 		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
 	}
@@ -268,7 +283,7 @@ func (container *Container) RedinessProbeHttpGet(path string, port int32, scheme
 	return container
 }
 
-func (container *Container) RedinessProbeTcpSocket(port int32, periodSeconds, failureThreshold int32) *Container {
+func (container *Container) RedinessProbeTcpSocket(port int32, initialDelaySeconds, periodSeconds, failureThreshold int32) *Container {
 	if container.Container.ReadinessProbe == nil {
 		container.Container.ReadinessProbe = &v1.Probe{}
 	}
@@ -277,6 +292,9 @@ func (container *Container) RedinessProbeTcpSocket(port int32, periodSeconds, fa
 			Type:   intstr.Int,
 			IntVal: port,
 		},
+	}
+	if initialDelaySeconds > 0 {
+		container.Container.ReadinessProbe.InitialDelaySeconds = initialDelaySeconds
 	}
 	if periodSeconds > 0 {
 		container.Container.ReadinessProbe.PeriodSeconds = periodSeconds
